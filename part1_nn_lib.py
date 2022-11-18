@@ -675,7 +675,7 @@ class Preprocessor(object):
         #######################################################################
         r_data = data*(self.max-self.min)+self.min
 
-        return np.around(r_data, 6)
+        return np.around(r_data, 12)
 
         #######################################################################
         #                       ** END OF YOUR CODE **
