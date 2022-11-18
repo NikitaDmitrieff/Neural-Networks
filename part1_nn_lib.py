@@ -654,8 +654,8 @@ class Preprocessor(object):
         #######################################################################
         #                       ** START OF YOUR CODE **
         #######################################################################
-        n_data = (data-self.min)/(self.max-self.min)
-        return n_data
+        data = (data-self.min)/(self.max-self.min)
+        return data
         #######################################################################
         #                       ** END OF YOUR CODE **
         #######################################################################
@@ -673,9 +673,9 @@ class Preprocessor(object):
         #######################################################################
         #                       ** START OF YOUR CODE **
         #######################################################################
-        r_data = data*(self.max-self.min)+self.min
+        data = data*(self.max-self.min)+self.min
 
-        return r_data
+        return data
 
         #######################################################################
         #                       ** END OF YOUR CODE **
