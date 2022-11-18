@@ -675,7 +675,7 @@ class Preprocessor(object):
         #######################################################################
         r_data = data*(self.max-self.min)+self.min
 
-        return r_data
+        return np.around(r_data, 6)
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -723,6 +723,10 @@ def example_main():
     targets = y_val.argmax(axis=1).squeeze()
     accuracy = (preds == targets).mean()
     print("Validation accuracy: {}".format(accuracy))
+
+    prep_input = Preprocessor(x_train)
+
+    print("Revert successful:",(x_train == prep_input.revert(x_train_pre)).all())
 
 
 if __name__ == "__main__":
