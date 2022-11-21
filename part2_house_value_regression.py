@@ -308,6 +308,7 @@ def example_main():
 
     x_train, x_test, y_train, y_test = split_dataset(x, y,
                                                      test_proportion=0.2,
+
                                                      random_generator=rg)
 
     # Training
