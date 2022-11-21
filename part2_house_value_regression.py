@@ -2,6 +2,9 @@ import torch
 import pickle
 import numpy as np
 import pandas as pd
+from pandas.api.types import is_numeric_dtype
+from sklearn.preprocessing import LabelBinarizer
+
 
 class Regressor():
 
@@ -53,13 +56,31 @@ class Regressor():
             
         """
 
-        #######################################################################
-        #                       ** START OF YOUR CODE **
-        #######################################################################
+        for column in x:
+            is_num = is_numeric_dtype(x[column])
+
+            if not is_num:
+                encoder_df = pd.DataFrame(LabelBinarizer().fit_transform(x[[column]]))
+                final_df = x.join(encoder_df)
+                final_df.drop(column, axis=1, inplace=True)
+
+        clean_x = final_df.dropna()
+
+        if y is not None:
+            removed_indexes = x[~x.index.isin(clean_x.index)]
+            removed_indexes_list = list(removed_indexes.index.values)
+            clean_y = y.drop(removed_indexes_list)
+
+        normalized_x = (clean_x - clean_x.min()) / (clean_x.max() - clean_x.min())
+
+        if y is not None:
+            assert len(clean_x.index) == len(clean_y.index)
+        # save settings
 
         # Replace this code with your own
         # Return preprocessed x and y, return None for y if it was None
-        return x, (y if isinstance(y, pd.DataFrame) else None)
+
+        return normalized_x, (clean_y if isinstance(y, pd.DataFrame) else None)
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -109,7 +130,7 @@ class Regressor():
         #                       ** START OF YOUR CODE **
         #######################################################################
 
-        X, _ = self._preprocessor(x, training = False) # Do not forget
+        # X, _ = self._preprocessor(x, training = False) # Do not forget
         pass
 
         #######################################################################
