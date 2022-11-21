@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e246c22d-96bf-4b08-8b7d-49bf20e6057f" name="Changes" comment="Working Part 2">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/part2_house_value_regression.py" beforeDir="false" afterPath="$PROJECT_DIR$/part2_house_value_regression.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/part2_model.pickle" beforeDir="false" afterPath="$PROJECT_DIR$/part2_model.pickle" afterDir="false" />
-    </list>
+    <list default="true" id="e246c22d-96bf-4b08-8b7d-49bf20e6057f" name="Changes" comment="Tests for part 2" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -180,7 +176,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="Ryan" />
+                        <option value="master" />
                       </list>
                     </value>
                   </entry>
