@@ -75,11 +75,11 @@ class Regressor():
         self.output_size = 1
         self.nb_epoch = nb_epoch
         self.labelB = LabelBinarizer()
+
         self.model = LinearRegression(n_input_vars=self.input_size)
         self.criterion = torch.nn.MSELoss()
         self.optimiser = torch.optim.SGD(self.model.parameters(), lr=0.0001)
-
-        return
+        self.linear = nn.Linear(self.input_size, 1)
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -118,25 +118,23 @@ class Regressor():
                     final_df = x.join(encoder_df)
                     final_df.drop(column, axis=1, inplace=True)
 
-
         clean_x = final_df.fillna(1)
-
-        # if y is not None:
-        #     removed_indexes = x[~x.index.isin(clean_x.index)]
-        #     removed_indexes_list = list(removed_indexes.index.values)
-        #     clean_y = y.drop(removed_indexes_list)
-
         normalized_x = (clean_x - clean_x.min()) / (clean_x.max() - clean_x.min())
 
+
         if y is not None:
-            assert len(clean_x.index) == len(y.index)
+            y = torch.tensor(y.astype(np.float32).values)
+            # assert len(clean_x.index) == len(y.index)
+
+        X_torch_tensor = torch.tensor(normalized_x.astype(np.float32).values)
+
+        return X_torch_tensor, (y if training else None)
+
         # save settings
 
         # print(normalized_x.columns)
         # Replace this code with your own
         # Return preprocessed x and y, return None for y if it was None
-
-        return normalized_x, (y if training else None)
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -162,17 +160,14 @@ class Regressor():
         #######################################################################
 
         X, Y = self._preprocessor(x, y = y, training = True) # Do not forget
-        X_torch_tensor = torch.tensor(X.astype(np.float32).values)
-        Y_torch_tensor = torch.tensor(Y.astype(np.float32).values)
-
 
         for epoch in range(self.nb_epoch):
             # Reset the gradients
             self.optimiser.zero_grad()
             # forward pass
-            y_hat = self.model(X_torch_tensor)
+            y_hat = self.model(X)
             # compute loss
-            loss = self.criterion(y_hat, Y_torch_tensor)
+            loss = self.criterion(y_hat, Y)
             # Backward pass (compute the gradients)
             loss.backward()
             # update parameters
@@ -205,10 +200,10 @@ class Regressor():
         #######################################################################
 
         X, _ = self._preprocessor(x, training=False) # Do not forget
-        X_torch_tensor = torch.tensor(X.astype(np.float32).values)
-        y_predictions = self.model.forward(X_torch_tensor)
+        y_predictions = self.model.forward(X)
 
-        return y_predictions.tolist()
+
+        return y_predictions.detach().numpy()
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -308,7 +303,6 @@ def example_main():
 
     x_train, x_test, y_train, y_test = split_dataset(x, y,
                                                      test_proportion=0.2,
-
                                                      random_generator=rg)
 
     # Training
@@ -316,7 +310,7 @@ def example_main():
     # You probably want to separate some held-out data 
     # to make sure the model isn't overfitting
 
-    regressor = Regressor(x_train, nb_epoch = 100000)
+    regressor = Regressor(x_train, nb_epoch = 1000)
     regressor.fit(x_train, y_train)
     save_regressor(regressor)
 

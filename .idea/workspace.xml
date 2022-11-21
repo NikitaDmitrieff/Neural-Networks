@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e246c22d-96bf-4b08-8b7d-49bf20e6057f" name="Changes" comment="Working Part 2">
-      <change beforePath="$PROJECT_DIR$/part1_nn_lib.py" beforeDir="false" afterPath="$PROJECT_DIR$/part1_nn_lib.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/part2_house_value_regression.py" beforeDir="false" afterPath="$PROJECT_DIR$/part2_house_value_regression.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/part2_model.pickle" beforeDir="false" afterPath="$PROJECT_DIR$/part2_model.pickle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -12,7 +14,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="Ryan" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -32,7 +34,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.part2_house_value_regression">
     <configuration name="linear" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Neural_Networks_095" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -99,8 +101,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.part2_house_value_regression" />
-        <item itemvalue="Python.linear" />
         <item itemvalue="Python.part1_nn_lib" />
+        <item itemvalue="Python.linear" />
+        <item itemvalue="Python.part2_house_value_regression" />
+        <item itemvalue="Python.linear" />
       </list>
     </recent_temporary>
   </component>
@@ -141,7 +145,28 @@
       <option name="project" value="LOCAL" />
       <updated>1669044382507</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Working Part 2">
+      <created>1669044542622</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1669044542622</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Working Part 2">
+      <created>1669044564025</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1669044564025</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Working Part 2">
+      <created>1669044645375</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1669044645375</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -155,7 +180,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/master" />
+                        <option value="Ryan" />
                       </list>
                     </value>
                   </entry>

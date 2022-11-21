@@ -122,7 +122,7 @@ class SigmoidLayer(Layer):
         #######################################################################
 
         self._cache_current = 1/(1+np.exp(-x))
-        print("Sigmoid Out dim:", self._cache_current.shape)
+
 
         return self._cache_current
 
@@ -181,11 +181,11 @@ class ReluLayer(Layer):
         #######################################################################
         #                       ** START OF YOUR CODE **
         #######################################################################
-        print("Relu In dim:", x.shape)
+
         x[x < 0] = 0
         self._cache_current = x
 
-        print("Relu Out dim:", self._cache_current.shape)
+
 
         return self._cache_current
 
@@ -276,8 +276,8 @@ class LinearLayer(Layer):
         assert fdw.shape[0] == x.shape[0], "Layer: first dim != batch_size"
         assert fdw.shape[1] == self.n_out, "Layer: 2nd dim != n_out"
 
-        print("Linear Layer forward shape:", fdw.shape)
-        print("self._W shape:", self._W.shape)
+
+
 
         return fdw
 
@@ -306,9 +306,7 @@ class LinearLayer(Layer):
         self._grad_W_current = self._cache_current.T @ grad_z
         self._grad_b_current = np.ones(shape=(grad_z.shape[0],1)).T @ grad_z
 
-        print("Linear Layer, backward grad_z input dim:", grad_z.shape)
-        print("Linear Layer, backward self.W  dim:", self._W.shape)
-        print("Linear Layer, backward grad W  dim:", self._grad_W_current.shape)
+
         return grad_z @ self._W.T
 
         #######################################################################
@@ -327,9 +325,11 @@ class LinearLayer(Layer):
         #                       ** START OF YOUR CODE **
         #######################################################################
 
-        print("self._W before update:", self._W.shape)
+
+
         self._W -= learning_rate * self._grad_W_current
-        print("self._W after update:", self._W.shape)
+
+
 
         self._b -= learning_rate * self._grad_b_current
 
@@ -582,7 +582,8 @@ class Trainer(object):
                 nn_result = self.network.forward(batch[0])
                 loss = self._loss_layer.forward(nn_result, batch[1])
                 grad_loss = self._loss_layer.backward()
-                print("Training - grad_loss dim", grad_loss.shape)
+
+
                 self.network.backward(grad_loss)
                 self.network.update_params(self.learning_rate)
 
