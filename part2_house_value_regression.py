@@ -212,6 +212,7 @@ def example_main():
     save_regressor(regressor)
 
     # Error
+
     error = regressor.score(x_train, y_train)
     print("\nRegressor error: {}\n".format(error))
 
