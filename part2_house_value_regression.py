@@ -128,7 +128,6 @@ class Regressor():
         X_torch_tensor = torch.tensor(normalized_x.astype(np.float32).values)
 
         return X_torch_tensor, (y if training else None)
-
         # save settings
 
         # print(normalized_x.columns)
@@ -138,7 +137,6 @@ class Regressor():
         #######################################################################
         #                       ** END OF YOUR CODE **
         #######################################################################
-
 
     def fit(self, x, y):
         """
