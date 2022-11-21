@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e246c22d-96bf-4b08-8b7d-49bf20e6057f" name="Changes" comment="Preprocessor fix">
-      <change beforePath="$PROJECT_DIR$/.idea/Neural_Networks_095.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Neural_Networks_095.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/part2_house_value_regression.py" beforeDir="false" afterPath="$PROJECT_DIR$/part2_house_value_regression.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -19,6 +16,7 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -71,6 +69,14 @@
       <option name="presentableId" value="Default" />
       <updated>1667783004200</updated>
     </task>
+    <task id="LOCAL-00001" summary="Preprocessor fix">
+      <created>1669034409772</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1669034409772</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -84,7 +90,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="Ryan" />
+                        <option value="origin/Ryan" />
                       </list>
                     </value>
                   </entry>

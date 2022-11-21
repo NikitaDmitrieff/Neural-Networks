@@ -72,7 +72,6 @@ class Regressor():
             clean_y = y.drop(removed_indexes_list)
 
         normalized_x = (clean_x - clean_x.min()) / (clean_x.max() - clean_x.min())
-
         if y is not None:
             assert len(clean_x.index) == len(clean_y.index)
         # save settings
