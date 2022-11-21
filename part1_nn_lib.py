@@ -634,8 +634,8 @@ class Preprocessor(object):
         #######################################################################
         #                       ** START OF YOUR CODE **
         #######################################################################
-        self.max = np.max(data)
-        self.min = np.min(data)
+        self.max = data.max(axis=0)
+        self.min = data.min(axis=0)
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -723,6 +723,10 @@ def example_main():
     targets = y_val.argmax(axis=1).squeeze()
     accuracy = (preds == targets).mean()
     print("Validation accuracy: {}".format(accuracy))
+
+    prep_input = Preprocessor(x_train)
+
+    print("Revert successful:",(x_train == prep_input.revert(x_train_pre)).all())
 
 
 if __name__ == "__main__":

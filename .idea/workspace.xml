@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e246c22d-96bf-4b08-8b7d-49bf20e6057f" name="Changes" comment="Working Part 2" />
+    <list default="true" id="e246c22d-96bf-4b08-8b7d-49bf20e6057f" name="Changes" comment="Working Part 2">
+      <change beforePath="$PROJECT_DIR$/part1_nn_lib.py" beforeDir="false" afterPath="$PROJECT_DIR$/part1_nn_lib.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,7 +12,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="Ryan" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -30,7 +32,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="Python.part2_house_value_regression">
+  <component name="RunManager">
     <configuration name="linear" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Neural_Networks_095" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -132,7 +134,14 @@
       <option name="project" value="LOCAL" />
       <updated>1669044137550</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Working Part 2">
+      <created>1669044382507</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1669044382507</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -146,7 +155,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/Ryan" />
+                        <option value="origin/master" />
                       </list>
                     </value>
                   </entry>
