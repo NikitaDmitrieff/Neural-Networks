@@ -1,10 +1,53 @@
 import torch
+import torch.nn as nn
+from numpy.random import default_rng
 import pickle
 import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
 from sklearn.preprocessing import LabelBinarizer
+from sklearn.metrics import mean_squared_error
 
+
+class LinearRegression(nn.Module):
+    def __init__(self, n_input_vars, n_output_vars=1):
+        super().__init__() # call constructor of superclass
+        self.linear = nn.Linear(n_input_vars, n_output_vars)
+
+    def forward(self, x):
+        return self.linear(x)
+
+
+def split_dataset(x, y, test_proportion, random_generator=default_rng()):
+    """ Split dataset into training and test sets, according to the given
+        test set proportion.
+
+    Args:
+        x (np.ndarray): Instances, numpy array with shape (N,K)
+        y (np.ndarray): Output label, numpy array with shape (N,)
+        test_proprotion (float): the desired proportion of test examples
+                                 (0.0-1.0)
+        random_generator (np.random.Generator): A random generator
+
+    Returns:
+        tuple: returns a tuple of (x_train, x_test, y_train, y_test)
+               - x_train (np.ndarray): Training instances shape (N_train, K)
+               - x_test (np.ndarray): Test instances shape (N_test, K)
+               - y_train (np.ndarray): Training labels, shape (N_train, )
+               - y_test (np.ndarray): Test labels, shape (N_test, )
+    """
+
+    shuffled_indices = random_generator.permutation(len(x))
+    n_test = round(len(x) * test_proportion)
+    n_train = len(x) - n_test
+
+    x_train = x.loc[shuffled_indices[:n_train]]
+    y_train = y.loc[shuffled_indices[:n_train]]
+    x_test = x.loc[shuffled_indices[n_train:]]
+    y_test = y.loc[shuffled_indices[n_train:]]
+
+
+    return (x_train, x_test, y_train, y_test)
 
 class Regressor():
 
@@ -27,10 +70,15 @@ class Regressor():
         #######################################################################
 
         # Replace this code with your own
-        X, _ = self._preprocessor(x, training = True)
-        self.input_size = X.shape[1]
+        self.X, self.Y = self._preprocessor(x, training = True)
+        self.input_size = self.X.shape[1]
         self.output_size = 1
-        self.nb_epoch = nb_epoch 
+        self.nb_epoch = nb_epoch
+        self.labelB = LabelBinarizer()
+        self.model = LinearRegression(n_input_vars=self.input_size)
+        self.criterion = torch.nn.MSELoss()
+        self.optimiser = torch.optim.SGD(self.model.parameters(), lr=0.0001)
+
         return
 
         #######################################################################
@@ -60,26 +108,35 @@ class Regressor():
             is_num = is_numeric_dtype(x[column])
 
             if not is_num:
-                encoder_df = pd.DataFrame(LabelBinarizer().fit_transform(x[[column]]))
-                final_df = x.join(encoder_df)
-                final_df.drop(column, axis=1, inplace=True)
+                if training:
+                    self.labelB = LabelBinarizer().fit_transform(x[[column]])
+                    encoder_df = pd.DataFrame(self.labelB)
+                    final_df = x.join(encoder_df)
+                    final_df.drop(column, axis=1, inplace=True)
+                else:
+                    encoder_df = pd.DataFrame(self.labelB)
+                    final_df = x.join(encoder_df)
+                    final_df.drop(column, axis=1, inplace=True)
 
-        clean_x = final_df.dropna()
 
-        if y is not None:
-            removed_indexes = x[~x.index.isin(clean_x.index)]
-            removed_indexes_list = list(removed_indexes.index.values)
-            clean_y = y.drop(removed_indexes_list)
+        clean_x = final_df.fillna(1)
+
+        # if y is not None:
+        #     removed_indexes = x[~x.index.isin(clean_x.index)]
+        #     removed_indexes_list = list(removed_indexes.index.values)
+        #     clean_y = y.drop(removed_indexes_list)
 
         normalized_x = (clean_x - clean_x.min()) / (clean_x.max() - clean_x.min())
+
         if y is not None:
-            assert len(clean_x.index) == len(clean_y.index)
+            assert len(clean_x.index) == len(y.index)
         # save settings
 
+        # print(normalized_x.columns)
         # Replace this code with your own
         # Return preprocessed x and y, return None for y if it was None
 
-        return normalized_x, (clean_y if isinstance(y, pd.DataFrame) else None)
+        return normalized_x, (y if training else None)
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -105,6 +162,24 @@ class Regressor():
         #######################################################################
 
         X, Y = self._preprocessor(x, y = y, training = True) # Do not forget
+        X_torch_tensor = torch.tensor(X.astype(np.float32).values)
+        Y_torch_tensor = torch.tensor(Y.astype(np.float32).values)
+
+
+        for epoch in range(self.nb_epoch):
+            # Reset the gradients
+            self.optimiser.zero_grad()
+            # forward pass
+            y_hat = self.model(X_torch_tensor)
+            # compute loss
+            loss = self.criterion(y_hat, Y_torch_tensor)
+            # Backward pass (compute the gradients)
+            loss.backward()
+            # update parameters
+            self.optimiser.step()
+
+            # print(f"Epoch: {epoch}\t w: {self.model.linear.weight.data[0]}\t b: {self.model.linear.bias.data[0]:.4f} \t L: {loss:.4f}")
+
         return self
 
         #######################################################################
@@ -129,8 +204,11 @@ class Regressor():
         #                       ** START OF YOUR CODE **
         #######################################################################
 
-        # X, _ = self._preprocessor(x, training = False) # Do not forget
-        pass
+        X, _ = self._preprocessor(x, training=False) # Do not forget
+        X_torch_tensor = torch.tensor(X.astype(np.float32).values)
+        y_predictions = self.model.forward(X_torch_tensor)
+
+        return y_predictions.tolist()
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -154,8 +232,10 @@ class Regressor():
         #                       ** START OF YOUR CODE **
         #######################################################################
 
-        X, Y = self._preprocessor(x, y = y, training = False) # Do not forget
-        return 0 # Replace this code with your own
+        y_predictions = self.predict(x)
+
+        assert len(y) == len(y_predictions)
+        return mean_squared_error(y, y_predictions, squared=False)
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -220,19 +300,27 @@ def example_main():
     data = pd.read_csv("housing.csv") 
 
     # Splitting input and output
-    x_train = data.loc[:, data.columns != output_label]
-    y_train = data.loc[:, [output_label]]
+    x = data.loc[:, data.columns != output_label]
+    y = data.loc[:, [output_label]]
+
+    seed = 60012
+    rg = default_rng(seed)
+
+    x_train, x_test, y_train, y_test = split_dataset(x, y,
+                                                     test_proportion=0.2,
+                                                     random_generator=rg)
 
     # Training
     # This example trains on the whole available dataset. 
     # You probably want to separate some held-out data 
     # to make sure the model isn't overfitting
-    regressor = Regressor(x_train, nb_epoch = 10)
+
+    regressor = Regressor(x_train, nb_epoch = 100000)
     regressor.fit(x_train, y_train)
     save_regressor(regressor)
 
     # Error
-    error = regressor.score(x_train, y_train)
+    error = regressor.score(x_test, y_test)
     print("\nRegressor error: {}\n".format(error))
 
 
