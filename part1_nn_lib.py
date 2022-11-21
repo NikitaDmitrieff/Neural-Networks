@@ -2,7 +2,7 @@ import numpy as np
 import pickle
 
 
-def xavier_init(size, gain = 1.0):
+def xavier_init(size, gain=1.0):
     """
     Xavier initialization of network weights.
 
@@ -121,8 +121,7 @@ class SigmoidLayer(Layer):
         #                       ** START OF YOUR CODE **
         #######################################################################
 
-        self._cache_current = 1/(1+np.exp(-x))
-
+        self._cache_current = 1 / (1 + np.exp(-x))
 
         return self._cache_current
 
@@ -147,7 +146,7 @@ class SigmoidLayer(Layer):
         #######################################################################
         #                       ** START OF YOUR CODE **
         #######################################################################
-        grad_sig = np.multiply(self._cache_current, 1-self._cache_current)
+        grad_sig = np.multiply(self._cache_current, 1 - self._cache_current)
         return np.multiply(grad_z, grad_sig)
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -185,10 +184,7 @@ class ReluLayer(Layer):
         x[x < 0] = 0
         self._cache_current = x
 
-
-
         return self._cache_current
-
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -269,15 +265,10 @@ class LinearLayer(Layer):
 
         self._cache_current = x
 
-
-
-        fdw = x @ self._W + np.repeat(self._b,[x.shape[0]], axis=0)
+        fdw = x @ self._W + np.repeat(self._b, [x.shape[0]], axis=0)
 
         assert fdw.shape[0] == x.shape[0], "Layer: first dim != batch_size"
         assert fdw.shape[1] == self.n_out, "Layer: 2nd dim != n_out"
-
-
-
 
         return fdw
 
@@ -304,8 +295,7 @@ class LinearLayer(Layer):
         #######################################################################
 
         self._grad_W_current = self._cache_current.T @ grad_z
-        self._grad_b_current = np.ones(shape=(grad_z.shape[0],1)).T @ grad_z
-
+        self._grad_b_current = np.ones(shape=(grad_z.shape[0], 1)).T @ grad_z
 
         return grad_z @ self._W.T
 
@@ -325,11 +315,7 @@ class LinearLayer(Layer):
         #                       ** START OF YOUR CODE **
         #######################################################################
 
-
-
         self._W -= learning_rate * self._grad_W_current
-
-
 
         self._b -= learning_rate * self._grad_b_current
 
@@ -371,12 +357,11 @@ class MultiLayerNetwork(object):
             self._layers.append(SigmoidLayer())
 
         for i in range(1, len(self.neurons)):
-            self._layers.append(LinearLayer(neurons[i-1], neurons[i]))
+            self._layers.append(LinearLayer(neurons[i - 1], neurons[i]))
             if activations[i] == 'relu':
                 self._layers.append(ReluLayer())
             elif activations[0] == 'sigmoid':
                 self._layers.append(SigmoidLayer())
-
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -396,7 +381,7 @@ class MultiLayerNetwork(object):
         #######################################################################
         #                       ** START OF YOUR CODE **
         #######################################################################
-        #return np.zeros((1, self.neurons[-1])) # Replace with your own code
+        # return np.zeros((1, self.neurons[-1])) # Replace with your own code
 
         fwd = x
         for layer in self._layers:
@@ -477,13 +462,13 @@ class Trainer(object):
     """
 
     def __init__(
-        self,
-        network,
-        batch_size,
-        nb_epoch,
-        learning_rate,
-        loss_fun,
-        shuffle_flag,
+            self,
+            network,
+            batch_size,
+            nb_epoch,
+            learning_rate,
+            loss_fun,
+            shuffle_flag,
     ):
         """
         Constructor of the Trainer.
@@ -575,7 +560,7 @@ class Trainer(object):
             batches = []
             k = 0
             while k < input_dataset.shape[0]:
-                batches.append((input_dataset[k:k+self.batch_size], target_dataset[k:k+self.batch_size]))
+                batches.append((input_dataset[k:k + self.batch_size], target_dataset[k:k + self.batch_size]))
                 k += self.batch_size
 
             for batch in batches:
@@ -583,10 +568,8 @@ class Trainer(object):
                 loss = self._loss_layer.forward(nn_result, batch[1])
                 grad_loss = self._loss_layer.backward()
 
-
                 self.network.backward(grad_loss)
                 self.network.update_params(self.learning_rate)
-
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -655,8 +638,8 @@ class Preprocessor(object):
         #######################################################################
         #                       ** START OF YOUR CODE **
         #######################################################################
-        n_data = (data-self.min)/(self.max-self.min)
-        return data
+        n_data = (data - self.min) / (self.max - self.min)
+        return n_data
         #######################################################################
         #                       ** END OF YOUR CODE **
         #######################################################################
@@ -674,7 +657,7 @@ class Preprocessor(object):
         #######################################################################
         #                       ** START OF YOUR CODE **
         #######################################################################
-        r_data = data*(self.max-self.min)+self.min
+        r_data = data * (self.max - self.min) + self.min
 
         return r_data
 
@@ -727,7 +710,7 @@ def example_main():
 
     prep_input = Preprocessor(x_train)
 
-    print("Revert successful:",(x_train == prep_input.revert(x_train_pre)).all())
+    print("Revert successful:", (x_train == prep_input.revert(x_train_pre)).all())
 
 
 if __name__ == "__main__":
