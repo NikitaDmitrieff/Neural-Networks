@@ -41,6 +41,7 @@ def split_dataset(x, y, test_proportion, random_generator=default_rng()):
     n_test = round(len(x) * test_proportion)
     n_train = len(x) - n_test
 
+
     x_train = x.loc[shuffled_indices[:n_train]]
     y_train = y.loc[shuffled_indices[:n_train]]
     x_test = x.loc[shuffled_indices[n_train:]]
