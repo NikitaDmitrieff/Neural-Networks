@@ -7,6 +7,9 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.metrics import mean_squared_error
+import torch.optim as optim
+from skorch import NeuralNetRegressor
+from sklearn.model_selection import GridSearchCV
 
 
 class LinearRegression(nn.Module):
@@ -54,12 +57,12 @@ class Regressor():
     def __init__(self, x, nb_epoch=1000):
         # You can add any input parameters you need
         # Remember to set them with a default value for LabTS tests
-        """ 
+        """
         Initialise the model.
-          
+
         Arguments:
-            - x {pd.DataFrame} -- Raw input data of shape 
-                (batch_size, input_size), used to compute the size 
+            - x {pd.DataFrame} -- Raw input data of shape
+                (batch_size, input_size), used to compute the size
                 of the network.
             - nb_epoch {int} -- number of epochs to train the network.
 
@@ -85,14 +88,14 @@ class Regressor():
         #######################################################################
 
     def _preprocessor(self, x, y=None, training=False):
-        """ 
+        """
         Preprocess input of the network.
-          
+
         Arguments:
-            - x {pd.DataFrame} -- Raw input array of shape 
+            - x {pd.DataFrame} -- Raw input array of shape
                 (batch_size, input_size).
             - y {pd.DataFrame} -- Raw target array of shape (batch_size, 1).
-            - training {boolean} -- Boolean indicating if we are training or 
+            - training {boolean} -- Boolean indicating if we are training or
                 testing the model.
 
         Returns:
@@ -100,7 +103,7 @@ class Regressor():
               size (batch_size, input_size). The input_size does not have to be the same as the input_size for x above.
             - {torch.tensor} or {numpy.ndarray} -- Preprocessed target array of
               size (batch_size, 1).
-            
+
         """
 
         for column in x:
@@ -142,7 +145,7 @@ class Regressor():
         Regressor training function
 
         Arguments:
-            - x {pd.DataFrame} -- Raw input array of shape 
+            - x {pd.DataFrame} -- Raw input array of shape
                 (batch_size, input_size).
             - y {pd.DataFrame} -- Raw output array of shape (batch_size, 1).
 
@@ -171,6 +174,7 @@ class Regressor():
 
             # print(f"Epoch: {epoch}\t w: {self.model.linear.weight.data[0]}\t b: {self.model.linear.bias.data[0]:.4f} \t L: {loss:.4f}")
 
+
         return self
 
         #######################################################################
@@ -182,7 +186,7 @@ class Regressor():
         Output the value corresponding to an input x.
 
         Arguments:
-            x {pd.DataFrame} -- Raw input array of shape 
+            x {pd.DataFrame} -- Raw input array of shape
                 (batch_size, input_size).
 
         Returns:
@@ -208,7 +212,7 @@ class Regressor():
         Function to evaluate the model accuracy on a validation dataset.
 
         Arguments:
-            - x {pd.DataFrame} -- Raw input array of shape 
+            - x {pd.DataFrame} -- Raw input array of shape
                 (batch_size, input_size).
             - y {pd.DataFrame} -- Raw output array of shape (batch_size, 1).
 
@@ -232,7 +236,7 @@ class Regressor():
 
 
 def save_regressor(trained_model):
-    """ 
+    """
     Utility function to save the trained regressor model in part2_model.pickle.
     """
     # If you alter this, make sure it works in tandem with load_regressor
@@ -242,7 +246,7 @@ def save_regressor(trained_model):
 
 
 def load_regressor():
-    """ 
+    """
     Utility function to load the trained regressor model in part2_model.pickle.
     """
     # If you alter this, make sure it works in tandem with save_regressor
@@ -252,19 +256,32 @@ def load_regressor():
     return trained_model
 
 
-def RegressorHyperParameterSearch():
+def RegressorHyperParameterSearch(x,y):
     # Ensure to add whatever inputs you deem necessary to this function
     """
-    Performs a hyper-parameter for fine-tuning the regressor implemented 
+    Performs a hyper-parameter for fine-tuning the regressor implemented
     in the Regressor class.
 
     Arguments:
         Add whatever inputs you need.
-        
+
     Returns:
-        The function should return your optimised hyper-parameters. 
+        The function should return your optimised hyper-parameters.
 
     """
+
+    net = NeuralNetRegressor(LinearRegression(n_input_vars=13)
+                             , max_epochs=100
+                             , lr=0.001
+                             , verbose=1)
+    params = {
+        'lr': [0.001, 0.005, 0.01],
+        'max_epochs': [500]
+    }
+
+    gs = GridSearchCV(net, params, refit=False, scoring='r2', verbose=1, cv=2)
+
+    gs.fit(x, y)
 
     #######################################################################
     #                       ** START OF YOUR CODE **
@@ -296,14 +313,22 @@ def example_main():
                                                      test_proportion=0.2,
                                                      random_generator=rg)
 
+
     # Training
-    # This example trains on the whole available dataset. 
-    # You probably want to separate some held-out data 
+    # This example trains on the whole available dataset.
+    # You probably want to separate some held-out data
     # to make sure the model isn't overfitting
 
-    regressor = Regressor(x_train, nb_epoch=200000)
+    regressor = Regressor(x_train, nb_epoch=1000)
     regressor.fit(x_train, y_train)
     save_regressor(regressor)
+
+    for name, param in regressor.model.named_parameters():
+        if param.requires_grad:
+            print(name, param.data)
+
+    x,y = regressor._preprocessor(x,y,True)
+    RegressorHyperParameterSearch(x, y)
 
     # Error
     error = regressor.score(x_test, y_test)
