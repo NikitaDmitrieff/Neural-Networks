@@ -78,8 +78,7 @@ class Regressor():
 
         self.model = LinearRegression(n_input_vars=self.input_size)
         self.criterion = torch.nn.MSELoss()
-        self.optimiser = torch.optim.SGD(self.model.parameters(), lr=0.0001)
-        self.linear = nn.Linear(self.input_size, 1)
+        self.optimiser = torch.optim.SGD(self.model.parameters(), lr=0.001)
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -302,7 +301,7 @@ def example_main():
     # You probably want to separate some held-out data 
     # to make sure the model isn't overfitting
 
-    regressor = Regressor(x_train, nb_epoch=1000)
+    regressor = Regressor(x_train, nb_epoch=200000)
     regressor.fit(x_train, y_train)
     save_regressor(regressor)
 
