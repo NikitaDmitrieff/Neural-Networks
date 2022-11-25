@@ -16,22 +16,12 @@ import torch.optim as optim
 
 
 class LinearRegression(nn.Module):
-    def __init__(self, n_input_vars, n_output_vars, nb_hidden):
-
-        if nb_hidden == 3:
-            hidden_size = [256, 512, 128]
-        elif nb_hidden == 4:
-            hidden_size = [256, 512, 256, 128]
-        elif nb_hidden == 5:
-            hidden_size = [256, 512, 512, 256, 128]
-        elif nb_hidden == 6:
-            hidden_size = [256, 512, 1024, 512, 256, 128]
-
+    def __init__(self, n_input_vars, n_output_vars):
         super().__init__()  # call constructor of superclass
-        self.input_layer = nn.Linear(n_input_vars, hidden_size[0])
+        self.input_layer = nn.Linear(n_input_vars, [256, 512, 1024, 512, 256, 128][0])
         self.hidden_layers = nn.ModuleList(
-            [nn.Linear(hidden_size[i], hidden_size[i + 1]) for i in range(len(hidden_size) - 1)])
-        self.output_layer = nn.Linear(hidden_size[-1], n_output_vars)
+            [nn.Linear([256, 512, 1024, 512, 256, 128][i], [256, 512, 1024, 512, 256, 128][i + 1]) for i in range(len([256, 512, 1024, 512, 256, 128]) - 1)])
+        self.output_layer = nn.Linear([256, 512, 1024, 512, 256, 128][-1], n_output_vars)
 
     def forward(self, x):
         x = nn.functional.relu(self.input_layer(x))
@@ -104,7 +94,7 @@ class Regressor():
         self.labelB = LabelBinarizer()
 
         #self.model = MutliLinearRegression(n_input_vars=self.input_size, n_output_vars=1, nb_hidden=nb_hidden)
-        self.model = LinearRegression(n_input_vars=self.input_size, n_output_vars=1, nb_hidden=6)
+        self.model = LinearRegression(n_input_vars=self.input_size, n_output_vars=1)
 
         self.criterion = torch.nn.MSELoss()
         self.optimiser = torch.optim.Adam(self.model.parameters(), lr=1e-4)
@@ -197,7 +187,7 @@ class Regressor():
                 # Reset the gradients
                 self.optimiser.zero_grad()
                 # forward pass
-                y_hat = self.model(x_batch)
+                y_hat = self.model.forward(x_batch)
                 # compute loss
                 loss = self.criterion(y_hat, y_batch)
                 # Backward pass (compute the gradients)
