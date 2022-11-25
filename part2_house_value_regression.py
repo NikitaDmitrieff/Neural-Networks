@@ -399,6 +399,7 @@ def cross_val(x, y, nb_epoch, nb_batch, nb_hidden, cv=5):
 
 
 def example_main():
+
     output_label = "median_house_value"
 
     # Use pandas to read CSV data as it contains various object types
@@ -422,8 +423,8 @@ def example_main():
     # You probably want to separate some held-out data
     # to make sure the model isn't overfitting
 
-    #regressor =  Regressor(x_train, nb_epoch=50, nb_batch=128, nb_hidden=6)
-    #train_loss = regressor.fit(x_train, y_train)
+    regressor =  Regressor(x_train, nb_epoch=50, nb_batch=128, nb_hidden=6)
+    train_loss = regressor.fit(x_train, y_train)
     #save_regressor(regressor)
 
     #plt.plot(train_loss)
@@ -440,7 +441,6 @@ def example_main():
     error = regressor_loaded.score(x_test, y_test)
     print("\nRegressor error (test): {}\n".format(error))
     
-
     #bestparams, besterror = RegressorHyperParameterSearch(x_train, x_test, y_train, y_test)
     #print("The lowest error is: ", besterror)
     #print("It is obtained with the following parameters:")
