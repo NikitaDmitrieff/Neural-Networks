@@ -16,12 +16,22 @@ import torch.optim as optim
 
 
 class LinearRegression(nn.Module):
-    def __init__(self, n_input_vars, n_output_vars):
+    def __init__(self, n_input_vars, n_output_vars, nb_hidden):
+
+        if nb_hidden == 3:
+            hidden_size = [256, 512, 128]
+        elif nb_hidden == 4:
+            hidden_size = [256, 512, 256, 128]
+        elif nb_hidden == 5:
+            hidden_size = [256, 512, 512, 256, 128]
+        elif nb_hidden == 6:
+            hidden_size = [256, 512, 1024, 512, 256, 128]
+
         super().__init__()  # call constructor of superclass
-        self.input_layer = nn.Linear(n_input_vars, [256, 512, 1024, 512, 256, 128][0])
+        self.input_layer = nn.Linear(n_input_vars, hidden_size[0])
         self.hidden_layers = nn.ModuleList(
-            [nn.Linear([256, 512, 1024, 512, 256, 128][i], [256, 512, 1024, 512, 256, 128][i + 1]) for i in range(len([256, 512, 1024, 512, 256, 128]) - 1)])
-        self.output_layer = nn.Linear([256, 512, 1024, 512, 256, 128][-1], n_output_vars)
+            [nn.Linear(hidden_size[i], hidden_size[i + 1]) for i in range(len(hidden_size) - 1)])
+        self.output_layer = nn.Linear(hidden_size[-1], n_output_vars)
 
     def forward(self, x):
         x = nn.functional.relu(self.input_layer(x))
@@ -94,7 +104,7 @@ class Regressor():
         self.labelB = LabelBinarizer()
 
         #self.model = MutliLinearRegression(n_input_vars=self.input_size, n_output_vars=1, nb_hidden=nb_hidden)
-        self.model = LinearRegression(n_input_vars=self.input_size, n_output_vars=1)
+        self.model = LinearRegression(n_input_vars=self.input_size, n_output_vars=1, nb_hidden=6)
 
         self.criterion = torch.nn.MSELoss()
         self.optimiser = torch.optim.Adam(self.model.parameters(), lr=1e-4)
@@ -136,7 +146,7 @@ class Regressor():
                     final_df = x.join(encoder_df)
                     final_df.drop(column, axis=1, inplace=True)
 
-        clean_x = final_df.fillna(1)
+        clean_x = final_df.fillna(final_df['total_bedrooms'].median())
         normalized_x = (clean_x - clean_x.min()) / (clean_x.max() - clean_x.min())
 
         if y is not None:
@@ -146,7 +156,6 @@ class Regressor():
         X_torch_tensor = torch.tensor(normalized_x.astype(np.float32).values)
 
         return X_torch_tensor, (y if training else None)
-
         # save settings
 
         # print(normalized_x.columns)
@@ -156,6 +165,7 @@ class Regressor():
         #######################################################################
         #                       ** END OF YOUR CODE **
         #######################################################################
+
 
     def fit(self, x, y):
         """
@@ -192,8 +202,6 @@ class Regressor():
             # print(f"Epoch: {epoch}\t w: {self.model.linear.weight.data[0]}\t b: {self.model.linear.bias.data[0]:.4f} \t L: {loss:.4f}")
 
         return self
-
-
 
 
         #######################################################################
@@ -285,7 +293,7 @@ def load_regressor():
     return trained_model
 
 
-def RegressorHyperParameterSearch():
+def RegressorHyperParameterSearch(x_train, x_test, y_train, y_test):
     """
     Performs a hyper-parameter for fine-tuning the regressor implemented
     in the Regressor class.
