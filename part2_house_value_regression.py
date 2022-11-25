@@ -6,16 +6,16 @@ import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
 from sklearn.preprocessing import LabelBinarizer
-from sklearn.model_selection import KFold
+# from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 #import matplotlib.pyplot as plt
 import torch.optim as optim
-from skorch import NeuralNetRegressor
+# from skorch import NeuralNetRegressor
 #import tqdm
-from sklearn.model_selection import GridSearchCV
+# from sklearn.model_selection import GridSearchCV
 
 
-class MutliLinearRegression(nn.Module):
+class LinearRegression(nn.Module):
     def __init__(self, n_input_vars, n_output_vars, nb_hidden):
 
         if nb_hidden == 3:
@@ -104,7 +104,7 @@ class Regressor():
         self.labelB = LabelBinarizer()
 
         #self.model = MutliLinearRegression(n_input_vars=self.input_size, n_output_vars=1, nb_hidden=nb_hidden)
-        self.model = MutliLinearRegression(n_input_vars=self.input_size, n_output_vars=1, nb_hidden=6)
+        self.model = LinearRegression(n_input_vars=self.input_size, n_output_vars=1, nb_hidden=6)
 
         self.criterion = torch.nn.MSELoss()
         self.optimiser = torch.optim.Adam(self.model.parameters(), lr=1e-4)
@@ -312,89 +312,90 @@ def RegressorHyperParameterSearch(x_train, x_test, y_train, y_test):
         The function should return your optimised hyper-parameters.
 
     """
-    parameters_dic = {'nb_batch': 1024, 'nb_epoch': 10, 'nb_hidden': 3}
+    return
+    # parameters_dic = {'nb_batch': 1024, 'nb_epoch': 10, 'nb_hidden': 3}
 
-    regressor = Regressor(x_train,
-                          nb_epoch=parameters_dic['nb_epoch'],
-                          nb_batch=parameters_dic['nb_batch'],
-                          nb_hidden=parameters_dic['nb_hidden'])
+    # regressor = Regressor(x_train,
+    #                       nb_epoch=parameters_dic['nb_epoch'],
+    #                       nb_batch=parameters_dic['nb_batch'],
+    #                       nb_hidden=parameters_dic['nb_hidden'])
 
-    regressor.fit(x_train, y_train)
-    lowest_error = regressor.score(x_test, y_test)
+    # regressor.fit(x_train, y_train)
+    # lowest_error = regressor.score(x_test, y_test)
 
-    parameters = {'nb_hidden': [3, 4, 5, 6],
-                  'nb_epoch': [50, 100, 500],
-                  'nb_batch': [128, 256, 512],
-                  }
+    # parameters = {'nb_hidden': [3, 4, 5, 6],
+    #               'nb_epoch': [50, 100, 500],
+    #               'nb_batch': [128, 256, 512],
+    #               }
 
-    batchs = [[],[],[],[]]
-    epochs = [[],[],[],[]]
-    hiddens = [[],[],[],[]]
-    errors = [[],[],[],[]]
+    # batchs = [[],[],[],[]]
+    # epochs = [[],[],[],[]]
+    # hiddens = [[],[],[],[]]
+    # errors = [[],[],[],[]]
 
-    for batch in parameters['nb_batch']:
-        for epoch in parameters['nb_epoch']:
-            for idx, hidden in enumerate(parameters['nb_hidden']):
+    # for batch in parameters['nb_batch']:
+    #     for epoch in parameters['nb_epoch']:
+    #         for idx, hidden in enumerate(parameters['nb_hidden']):
 
-                mean_error = cross_val(x_train, y_train, nb_epoch=epoch, nb_batch=batch, nb_hidden=hidden, cv=5)
+    #             mean_error = cross_val(x_train, y_train, nb_epoch=epoch, nb_batch=batch, nb_hidden=hidden, cv=5)
 
-                batchs[idx].append(batch)
-                epochs[idx].append(epoch)
-                hiddens[idx].append(hidden)
-                errors[idx].append(mean_error)
+    #             batchs[idx].append(batch)
+    #             epochs[idx].append(epoch)
+    #             hiddens[idx].append(hidden)
+    #             errors[idx].append(mean_error)
 
-                if mean_error < lowest_error:
-                    lowest_error = mean_error
-                    parameters_dic["nb_hidden"] = hidden
-                    parameters_dic["nb_epoch"] = epoch
-                    parameters_dic["nb_batch"] = batch
+    #             if mean_error < lowest_error:
+    #                 lowest_error = mean_error
+    #                 parameters_dic["nb_hidden"] = hidden
+    #                 parameters_dic["nb_epoch"] = epoch
+    #                 parameters_dic["nb_batch"] = batch
 
 
 
-    # Creating figure
-    #fig = plt.figure(figsize=(10, 7))
-    #ax = plt.axes(projection="3d")
-    #ax.set_xlabel('Batch size')
-    #ax.set_ylabel('Number of epochs')
-    #ax.set_zlabel('Error (RMSE)')
+    # # Creating figure
+    # #fig = plt.figure(figsize=(10, 7))
+    # #ax = plt.axes(projection="3d")
+    # #ax.set_xlabel('Batch size')
+    # #ax.set_ylabel('Number of epochs')
+    # #ax.set_zlabel('Error (RMSE)')
 
-    # for hidden in hiddens:
-    #ax.scatter3D(batchs[0], epochs[0], errors[0], marker='<')
-    #ax.scatter3D(batchs[1], epochs[1], errors[1], marker='o')
-    #ax.scatter3D(batchs[2], epochs[2], errors[2], marker='x')
-    #ax.scatter3D(batchs[3], epochs[3], errors[3], marker='s')
-    #ax.legend(['3','4','5','6'], title='Number of hidden layers', loc='best')
+    # # for hidden in hiddens:
+    # #ax.scatter3D(batchs[0], epochs[0], errors[0], marker='<')
+    # #ax.scatter3D(batchs[1], epochs[1], errors[1], marker='o')
+    # #ax.scatter3D(batchs[2], epochs[2], errors[2], marker='x')
+    # #ax.scatter3D(batchs[3], epochs[3], errors[3], marker='s')
+    # #ax.legend(['3','4','5','6'], title='Number of hidden layers', loc='best')
 
-    #ax.grid(True)
-    #plt.title("Regressor Hyperparameter Search between 36 models with Adam optimizer, \n learning rate = 1e-4 and 5 folds cross validation")
-    # show plot
-    #plt.show()
+    # #ax.grid(True)
+    # #plt.title("Regressor Hyperparameter Search between 36 models with Adam optimizer, \n learning rate = 1e-4 and 5 folds cross validation")
+    # # show plot
+    # #plt.show()
 
-    return parameters_dic, lowest_error
+    # return parameters_dic, lowest_error
     #######################################################################
     #                       ** END OF YOUR CODE **
     #######################################################################
 
 
-def cross_val(x, y, nb_epoch, nb_batch, nb_hidden, cv=5):
+# def cross_val(x, y, nb_epoch, nb_batch, nb_hidden, cv=5):
 
-    list_of_errors = []
-    kf = KFold(n_splits=cv)
-    kf.get_n_splits(x)
+#     list_of_errors = []
+#     kf = KFold(n_splits=cv)
+#     kf.get_n_splits(x)
 
-    for train_index, val_index in kf.split(x):
+#     for train_index, val_index in kf.split(x):
 
-        x_train, x_val = x.iloc[train_index], x.iloc[val_index]
-        y_train, y_val = y.iloc[train_index], y.iloc[val_index]
+#         x_train, x_val = x.iloc[train_index], x.iloc[val_index]
+#         y_train, y_val = y.iloc[train_index], y.iloc[val_index]
 
-        regressor = Regressor(x_train, nb_epoch=nb_epoch, nb_batch=nb_batch, nb_hidden=nb_hidden)
-        regressor.fit(x_train, y_train)
-        error = regressor.score(x_val, y_val)
-        list_of_errors.append(error)
+#         regressor = Regressor(x_train, nb_epoch=nb_epoch, nb_batch=nb_batch, nb_hidden=nb_hidden)
+#         regressor.fit(x_train, y_train)
+#         error = regressor.score(x_val, y_val)
+#         list_of_errors.append(error)
 
-    avg = sum(list_of_errors) / len(list_of_errors)
+#     avg = sum(list_of_errors) / len(list_of_errors)
 
-    return avg
+#     return avg
 
 
 
