@@ -213,7 +213,7 @@ class Regressor():
             # Reset the gradients
             self.optimiser.zero_grad()
             # forward pass
-            y_hat = self.model(X)
+            y_hat = self.model.forward(X)
             # compute loss
             loss = self.criterion(y_hat, Y)
             # Backward pass (compute the gradients)
@@ -248,7 +248,7 @@ class Regressor():
         #######################################################################
 
         X, _ = self._preprocessor(x, training=False)  # Do not forget
-        y_predictions = self.model(X)
+        y_predictions = self.model.forward(X)
 
         return y_predictions.detach().numpy()
 
