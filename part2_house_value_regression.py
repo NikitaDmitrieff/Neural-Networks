@@ -74,7 +74,8 @@ def split_dataset(x, y, test_proportion, random_generator=default_rng()):
 
 class Regressor:
 
-    def __init__(self, x, nb_epoch=1000, nb_batch=256, nb_hidden=6):
+    #def __init__(self, x, nb_epoch=1000, nb_batch=256, nb_hidden=6):
+    def __init__(self, x, nb_epoch=1000, nb_hidden=6):
         # You can add any input parameters you need
         # Remember to set them with a default value for LabTS tests
         """
@@ -93,7 +94,8 @@ class Regressor:
         #######################################################################
 
         # Replace this code with your own
-        self.nb_batch = nb_batch
+        #self.nb_batch = nb_batch
+        self.nb_batch = 128
 
         self.X, self.Y = self._preprocessor(x, training=True)
         self.input_size = self.X.shape[1]
@@ -101,7 +103,8 @@ class Regressor:
         self.nb_epoch = nb_epoch
         self.labelB = LabelBinarizer()
 
-        self.model = MutliLinearRegression(n_input_vars=self.input_size, n_output_vars=1, nb_hidden=nb_hidden)
+        #self.model = MutliLinearRegression(n_input_vars=self.input_size, n_output_vars=1, nb_hidden=nb_hidden)
+        self.model = MutliLinearRegression(n_input_vars=self.input_size, n_output_vars=1, nb_hidden=6)
 
         self.criterion = torch.nn.MSELoss()
         self.optimiser = torch.optim.Adam(self.model.parameters(), lr=1e-4)
@@ -422,7 +425,7 @@ def example_main():
     # You probably want to separate some held-out data
     # to make sure the model isn't overfitting
 
-    regressor =  Regressor(x_train, nb_epoch=50, nb_batch=128, nb_hidden=6)
+    regressor =  Regressor(x_train, nb_epoch=50)
     regressor.fit(x_train, y_train)
     save_regressor(regressor)
 
