@@ -298,7 +298,7 @@ def load_regressor():
     return trained_model
 
 
-def RegressorHyperParameterSearch(x_train, x_test, y_train, y_test):
+def RegressorHyperParameterSearch():
     """
     Performs a hyper-parameter for fine-tuning the regressor implemented
     in the Regressor class.
