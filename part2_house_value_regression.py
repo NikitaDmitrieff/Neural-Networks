@@ -146,7 +146,7 @@ class Regressor():
                     final_df = x.join(encoder_df)
                     final_df.drop(column, axis=1, inplace=True)
 
-        clean_x = final_df.fillna(final_df['total_bedrooms'].median())
+        clean_x = final_df.fillna(1)
         normalized_x = (clean_x - clean_x.min()) / (clean_x.max() - clean_x.min())
 
         if y is not None:
@@ -156,6 +156,7 @@ class Regressor():
         X_torch_tensor = torch.tensor(normalized_x.astype(np.float32).values)
 
         return X_torch_tensor, (y if training else None)
+
         # save settings
 
         # print(normalized_x.columns)
