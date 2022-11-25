@@ -421,7 +421,7 @@ def example_main():
     # You probably want to separate some held-out data 
     # to make sure the model isn't overfitting
 
-    regressor = Regressor(x_train, nb_epoch=50)
+    regressor = Regressor(x_train, nb_epoch=1000)
     regressor.fit(x_train, y_train)
     save_regressor(regressor)
 
