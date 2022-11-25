@@ -15,6 +15,8 @@ import torch.optim as optim
 # from sklearn.model_selection import GridSearchCV
 
 
+
+
 class LinearRegression(nn.Module):
     def __init__(self, n_input_vars, n_output_vars, nb_hidden):
 
@@ -39,6 +41,26 @@ class LinearRegression(nn.Module):
             x = nn.functional.relu(layer(x))
 
         return self.output_layer(x)
+
+def cross_val(x, y, nb_epoch, nb_batch, nb_hidden, cv=5):
+
+    list_of_errors = []
+    kf = KFold(n_splits=cv)
+    kf.get_n_splits(x)
+
+    for train_index, val_index in kf.split(x):
+
+        x_train, x_val = x.iloc[train_index], x.iloc[val_index]
+        y_train, y_val = y.iloc[train_index], y.iloc[val_index]
+
+        regressor = Regressor(x_train, nb_epoch=nb_epoch, nb_batch=nb_batch, nb_hidden=nb_hidden)
+        regressor.fit(x_train, y_train)
+        error = regressor.score(x_val, y_val)
+        list_of_errors.append(error)
+
+     avg = sum(list_of_errors) / len(list_of_errors)
+     
+     return avg
 
 
 def split_dataset(x, y, test_proportion, random_generator=default_rng()):
@@ -307,43 +329,43 @@ def RegressorHyperParameterSearch(x_train, x_test, y_train, y_test):
         The function should return your optimised hyper-parameters.
 
     """
-    return
-    # parameters_dic = {'nb_batch': 1024, 'nb_epoch': 10, 'nb_hidden': 3}
+   
+    parameters_dic = {'nb_batch': 1024, 'nb_epoch': 10, 'nb_hidden': 3}
 
-    # regressor = Regressor(x_train,
-    #                       nb_epoch=parameters_dic['nb_epoch'],
-    #                       nb_batch=parameters_dic['nb_batch'],
-    #                       nb_hidden=parameters_dic['nb_hidden'])
+    regressor = Regressor(x_train,
+                          nb_epoch=parameters_dic['nb_epoch'],
+                          nb_batch=parameters_dic['nb_batch'],
+                          nb_hidden=parameters_dic['nb_hidden'])
 
-    # regressor.fit(x_train, y_train)
-    # lowest_error = regressor.score(x_test, y_test)
+    regressor.fit(x_train, y_train)
+    lowest_error = regressor.score(x_test, y_test)
 
-    # parameters = {'nb_hidden': [3, 4, 5, 6],
-    #               'nb_epoch': [50, 100, 500],
-    #               'nb_batch': [128, 256, 512],
-    #               }
+    parameters = {'nb_hidden': [3, 4, 5, 6],
+                  'nb_epoch': [50, 100, 500],
+                  'nb_batch': [128, 256, 512],
+                  }
 
-    # batchs = [[],[],[],[]]
-    # epochs = [[],[],[],[]]
-    # hiddens = [[],[],[],[]]
-    # errors = [[],[],[],[]]
+    batchs = [[],[],[],[]]
+    epochs = [[],[],[],[]]
+    hiddens = [[],[],[],[]]
+    errors = [[],[],[],[]]
 
-    # for batch in parameters['nb_batch']:
-    #     for epoch in parameters['nb_epoch']:
-    #         for idx, hidden in enumerate(parameters['nb_hidden']):
+    for batch in parameters['nb_batch']:
+        for epoch in parameters['nb_epoch']:
+            for idx, hidden in enumerate(parameters['nb_hidden']):
 
-    #             mean_error = cross_val(x_train, y_train, nb_epoch=epoch, nb_batch=batch, nb_hidden=hidden, cv=5)
+                mean_error = cross_val(x_train, y_train, nb_epoch=epoch, nb_batch=batch, nb_hidden=hidden, cv=5)
 
-    #             batchs[idx].append(batch)
-    #             epochs[idx].append(epoch)
-    #             hiddens[idx].append(hidden)
-    #             errors[idx].append(mean_error)
+                batchs[idx].append(batch)
+                epochs[idx].append(epoch)
+                hiddens[idx].append(hidden)
+                errors[idx].append(mean_error)
 
-    #             if mean_error < lowest_error:
-    #                 lowest_error = mean_error
-    #                 parameters_dic["nb_hidden"] = hidden
-    #                 parameters_dic["nb_epoch"] = epoch
-    #                 parameters_dic["nb_batch"] = batch
+                if mean_error < lowest_error:
+                    lowest_error = mean_error
+                    parameters_dic["nb_hidden"] = hidden
+                    parameters_dic["nb_epoch"] = epoch
+                    parameters_dic["nb_batch"] = batch
 
 
 
@@ -366,31 +388,10 @@ def RegressorHyperParameterSearch(x_train, x_test, y_train, y_test):
     # # show plot
     # #plt.show()
 
-    # return parameters_dic, lowest_error
+    return parameters_dic, lowest_error
     #######################################################################
     #                       ** END OF YOUR CODE **
-    #######################################################################
-
-
-# def cross_val(x, y, nb_epoch, nb_batch, nb_hidden, cv=5):
-
-#     list_of_errors = []
-#     kf = KFold(n_splits=cv)
-#     kf.get_n_splits(x)
-
-#     for train_index, val_index in kf.split(x):
-
-#         x_train, x_val = x.iloc[train_index], x.iloc[val_index]
-#         y_train, y_val = y.iloc[train_index], y.iloc[val_index]
-
-#         regressor = Regressor(x_train, nb_epoch=nb_epoch, nb_batch=nb_batch, nb_hidden=nb_hidden)
-#         regressor.fit(x_train, y_train)
-#         error = regressor.score(x_val, y_val)
-#         list_of_errors.append(error)
-
-#     avg = sum(list_of_errors) / len(list_of_errors)
-
-#     return avg
+    
 
 
 
