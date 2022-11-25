@@ -8,12 +8,10 @@ from pandas.api.types import is_numeric_dtype
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
-from mpl_toolkits import mplot3d
-import matplotlib.pyplot as plt
-import matplotlib as mpl
+#import matplotlib.pyplot as plt
 import torch.optim as optim
 from skorch import NeuralNetRegressor
-import tqdm
+#import tqdm
 from sklearn.model_selection import GridSearchCV
 
 
@@ -187,7 +185,8 @@ class Regressor:
         losses = []
 
 
-        for _ in tqdm.tqdm(range(self.nb_epoch)):
+        #for _ in tqdm.tqdm(range(self.nb_epoch)):
+        for _ in range(self.nb_epoch):
             for batch in range(len(X) // self.nb_batch):
                 x_batch = X[batch * self.nb_batch:(batch + 1) * self.nb_batch]
                 y_batch = Y[batch * self.nb_batch:(batch + 1) * self.nb_batch]
@@ -350,23 +349,23 @@ def RegressorHyperParameterSearch(x_train, x_test, y_train, y_test):
 
 
     # Creating figure
-    fig = plt.figure(figsize=(10, 7))
-    ax = plt.axes(projection="3d")
-    ax.set_xlabel('Batch size')
-    ax.set_ylabel('Number of epochs')
-    ax.set_zlabel('Error (RMSE)')
+    #fig = plt.figure(figsize=(10, 7))
+    #ax = plt.axes(projection="3d")
+    #ax.set_xlabel('Batch size')
+    #ax.set_ylabel('Number of epochs')
+    #ax.set_zlabel('Error (RMSE)')
 
     # for hidden in hiddens:
-    ax.scatter3D(batchs[0], epochs[0], errors[0], marker='<')
-    ax.scatter3D(batchs[1], epochs[1], errors[1], marker='o')
-    ax.scatter3D(batchs[2], epochs[2], errors[2], marker='x')
-    ax.scatter3D(batchs[3], epochs[3], errors[3], marker='s')
-    ax.legend(['3','4','5','6'], title='Number of hidden layers', loc='best')
+    #ax.scatter3D(batchs[0], epochs[0], errors[0], marker='<')
+    #ax.scatter3D(batchs[1], epochs[1], errors[1], marker='o')
+    #ax.scatter3D(batchs[2], epochs[2], errors[2], marker='x')
+    #ax.scatter3D(batchs[3], epochs[3], errors[3], marker='s')
+    #ax.legend(['3','4','5','6'], title='Number of hidden layers', loc='best')
 
-    ax.grid(True)
-    plt.title("Regressor Hyperparameter Search between 36 models with Adam optimizer, \n learning rate = 1e-4 and 5 folds cross validation")
+    #ax.grid(True)
+    #plt.title("Regressor Hyperparameter Search between 36 models with Adam optimizer, \n learning rate = 1e-4 and 5 folds cross validation")
     # show plot
-    plt.show()
+    #plt.show()
 
     return parameters_dic, lowest_error
     #######################################################################
@@ -423,9 +422,9 @@ def example_main():
     # You probably want to separate some held-out data
     # to make sure the model isn't overfitting
 
-    #regressor =  Regressor(x_train, nb_epoch=50, nb_batch=128, nb_hidden=6)
-    #regressor.fit(x_train, y_train)
-    #save_regressor(regressor)
+    regressor =  Regressor(x_train, nb_epoch=50, nb_batch=128, nb_hidden=6)
+    regressor.fit(x_train, y_train)
+    save_regressor(regressor)
 
     #plt.plot(train_loss)
     #plt.show()
@@ -435,13 +434,13 @@ def example_main():
     #         print(name, param.data)
     
     #print("Before loading")
-    regressor_loaded = load_regressor()	
+    #regressor_loaded = load_regressor()	
     
     # Error
     #error_train = regressor.score(x_train, y_train)
     #print("\nRegressor error (train): {}\n".format(error_train))
-    #error = regressor.score(x_test, y_test)
-    error = regressor_loaded.score(x_test, y_test)
+    error = regressor.score(x_test, y_test)
+    #error = regressor_loaded.score(x_test, y_test)
     print("\nRegressor error (test): {}\n".format(error))
     
     #bestparams, besterror = RegressorHyperParameterSearch(x_train, x_test, y_train, y_test)
