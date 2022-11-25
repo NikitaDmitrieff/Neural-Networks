@@ -205,7 +205,7 @@ class Regressor:
 
             # print(f"Epoch: {epoch}\t w: {self.model.linear.weight.data[0]}\t b: {self.model.linear.bias.data[0]:.4f} \t L: {loss:.4f}")
 
-        return losses
+        return self
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -317,7 +317,7 @@ def RegressorHyperParameterSearch(x_train, x_test, y_train, y_test):
                           nb_batch=parameters_dic['nb_batch'],
                           nb_hidden=parameters_dic['nb_hidden'])
 
-    _ = regressor.fit(x_train, y_train)
+    regressor.fit(x_train, y_train)
     lowest_error = regressor.score(x_test, y_test)
 
     parameters = {'nb_hidden': [3, 4, 5, 6],
@@ -423,8 +423,8 @@ def example_main():
     # You probably want to separate some held-out data
     # to make sure the model isn't overfitting
 
-    regressor =  Regressor(x_train, nb_epoch=50, nb_batch=128, nb_hidden=6)
-    train_loss = regressor.fit(x_train, y_train)
+    #regressor =  Regressor(x_train, nb_epoch=50, nb_batch=128, nb_hidden=6)
+    #regressor.fit(x_train, y_train)
     #save_regressor(regressor)
 
     #plt.plot(train_loss)
@@ -433,11 +433,14 @@ def example_main():
     # for name, param in regressor.model.named_parameters():
     #     if param.requires_grad:
     #         print(name, param.data)
-    print("Before loading")
+    
+    #print("Before loading")
     regressor_loaded = load_regressor()	
+    
     # Error
     #error_train = regressor.score(x_train, y_train)
     #print("\nRegressor error (train): {}\n".format(error_train))
+    #error = regressor.score(x_test, y_test)
     error = regressor_loaded.score(x_test, y_test)
     print("\nRegressor error (test): {}\n".format(error))
     
