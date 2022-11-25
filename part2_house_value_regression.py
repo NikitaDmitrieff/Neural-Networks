@@ -72,7 +72,7 @@ def split_dataset(x, y, test_proportion, random_generator=default_rng()):
     return x_train, x_test, y_train, y_test
 
 
-class Regressor:
+class Regressor():
 
     #def __init__(self, x, nb_epoch=1000, nb_batch=256, nb_hidden=6):
     def __init__(self, x, nb_epoch=1000):
