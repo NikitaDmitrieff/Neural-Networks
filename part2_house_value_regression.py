@@ -75,7 +75,7 @@ def split_dataset(x, y, test_proportion, random_generator=default_rng()):
 class Regressor:
 
     #def __init__(self, x, nb_epoch=1000, nb_batch=256, nb_hidden=6):
-    def __init__(self, x, nb_epoch=1000, nb_hidden=6):
+    def __init__(self, x, nb_epoch=1000):
         # You can add any input parameters you need
         # Remember to set them with a default value for LabTS tests
         """
