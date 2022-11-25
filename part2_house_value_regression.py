@@ -6,19 +6,41 @@ import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
 from sklearn.preprocessing import LabelBinarizer
+from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
+from mpl_toolkits import mplot3d
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 import torch.optim as optim
 from skorch import NeuralNetRegressor
+import tqdm
 from sklearn.model_selection import GridSearchCV
 
 
-class LinearRegression(nn.Module):
-    def __init__(self, n_input_vars, n_output_vars=1):
+class MutliLinearRegression(nn.Module):
+    def __init__(self, n_input_vars, n_output_vars, nb_hidden):
+
+        if nb_hidden == 3:
+            hidden_size = [256, 512, 128]
+        elif nb_hidden == 4:
+            hidden_size = [256, 512, 256, 128]
+        elif nb_hidden == 5:
+            hidden_size = [256, 512, 512, 256, 128]
+        elif nb_hidden == 6:
+            hidden_size = [256, 512, 1024, 512, 256, 128]
+
         super().__init__()  # call constructor of superclass
-        self.linear = nn.Linear(n_input_vars, n_output_vars)
+        self.input_layer = nn.Linear(n_input_vars, hidden_size[0])
+        self.hidden_layers = nn.ModuleList(
+            [nn.Linear(hidden_size[i], hidden_size[i + 1]) for i in range(len(hidden_size) - 1)])
+        self.output_layer = nn.Linear(hidden_size[-1], n_output_vars)
 
     def forward(self, x):
-        return self.linear(x)
+        x = nn.functional.relu(self.input_layer(x))
+        for layer in self.hidden_layers:
+            x = nn.functional.relu(layer(x))
+
+        return self.output_layer(x)
 
 
 def split_dataset(x, y, test_proportion, random_generator=default_rng()):
@@ -52,9 +74,9 @@ def split_dataset(x, y, test_proportion, random_generator=default_rng()):
     return x_train, x_test, y_train, y_test
 
 
-class Regressor():
+class Regressor:
 
-    def __init__(self, x, nb_epoch=1000):
+    def __init__(self, x, nb_epoch=1000, nb_batch=256, nb_hidden=6):
         # You can add any input parameters you need
         # Remember to set them with a default value for LabTS tests
         """
@@ -73,15 +95,18 @@ class Regressor():
         #######################################################################
 
         # Replace this code with your own
+        self.nb_batch = nb_batch
+
         self.X, self.Y = self._preprocessor(x, training=True)
         self.input_size = self.X.shape[1]
         self.output_size = 1
         self.nb_epoch = nb_epoch
         self.labelB = LabelBinarizer()
 
-        self.model = LinearRegression(n_input_vars=self.input_size)
+        self.model = MutliLinearRegression(n_input_vars=self.input_size, n_output_vars=1, nb_hidden=nb_hidden)
+
         self.criterion = torch.nn.MSELoss()
-        self.optimiser = torch.optim.SGD(self.model.parameters(), lr=0.001)
+        self.optimiser = torch.optim.Adam(self.model.parameters(), lr=1e-4)
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -120,7 +145,7 @@ class Regressor():
                     final_df = x.join(encoder_df)
                     final_df.drop(column, axis=1, inplace=True)
 
-        clean_x = final_df.fillna(1)
+        clean_x = final_df.fillna(final_df['total_bedrooms'].median())
         normalized_x = (clean_x - clean_x.min()) / (clean_x.max() - clean_x.min())
 
         if y is not None:
@@ -159,23 +184,28 @@ class Regressor():
         #######################################################################
 
         X, Y = self._preprocessor(x, y=y, training=True)  # Do not forget
+        losses = []
 
-        for epoch in range(self.nb_epoch):
-            # Reset the gradients
-            self.optimiser.zero_grad()
-            # forward pass
-            y_hat = self.model(X)
-            # compute loss
-            loss = self.criterion(y_hat, Y)
-            # Backward pass (compute the gradients)
-            loss.backward()
-            # update parameters
-            self.optimiser.step()
+
+        for _ in tqdm.tqdm(range(self.nb_epoch)):
+            for batch in range(len(X) // self.nb_batch):
+                x_batch = X[batch * self.nb_batch:(batch + 1) * self.nb_batch]
+                y_batch = Y[batch * self.nb_batch:(batch + 1) * self.nb_batch]
+                # Reset the gradients
+                self.optimiser.zero_grad()
+                # forward pass
+                y_hat = self.model(x_batch)
+                # compute loss
+                loss = self.criterion(y_hat, y_batch)
+                # Backward pass (compute the gradients)
+                loss.backward()
+                # update parameters
+                self.optimiser.step()
+            losses.append(np.sqrt(loss.item()))
 
             # print(f"Epoch: {epoch}\t w: {self.model.linear.weight.data[0]}\t b: {self.model.linear.bias.data[0]:.4f} \t L: {loss:.4f}")
 
-
-        return self
+        return losses
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -199,7 +229,7 @@ class Regressor():
         #######################################################################
 
         X, _ = self._preprocessor(x, training=False)  # Do not forget
-        y_predictions = self.model.forward(X)
+        y_predictions = self.model(X)
 
         return y_predictions.detach().numpy()
 
@@ -228,7 +258,17 @@ class Regressor():
         y_predictions = self.predict(x)
 
         assert len(y) == len(y_predictions)
-        return mean_squared_error(y, y_predictions, squared=False)
+
+        mse = mean_squared_error(y, y_predictions, squared=True)
+        SSres = np.sum((y.to_numpy()-y_predictions)**2)
+        SStot = ((y.to_numpy() - y.to_numpy().mean()) ** 2).sum()
+        determination_coef = 1 - SSres / SStot
+
+        print('The R2 is: ', determination_coef)
+        rmse = mean_squared_error(y, y_predictions, squared=False)
+        print('The RMSE is: ', rmse)
+
+        return rmse
 
         #######################################################################
         #                       ** END OF YOUR CODE **
@@ -256,42 +296,106 @@ def load_regressor():
     return trained_model
 
 
-def RegressorHyperParameterSearch(x,y):
-    # Ensure to add whatever inputs you deem necessary to this function
+def RegressorHyperParameterSearch(x_train, x_test, y_train, y_test):
     """
     Performs a hyper-parameter for fine-tuning the regressor implemented
     in the Regressor class.
 
     Arguments:
-        Add whatever inputs you need.
+        - x {pd.DataFrame} -- Raw input array of shape
+            (batch_size, input_size).
+        - y {pd.DataFrame} -- Raw output array of shape (batch_size, 1).
 
     Returns:
         The function should return your optimised hyper-parameters.
 
     """
+    parameters_dic = {'nb_batch': 1024, 'nb_epoch': 10, 'nb_hidden': 3}
 
-    net = NeuralNetRegressor(LinearRegression(n_input_vars=13)
-                             , max_epochs=100
-                             , lr=0.001
-                             , verbose=1)
-    params = {
-        'lr': [0.001, 0.005, 0.01],
-        'max_epochs': [500]
-    }
+    regressor = Regressor(x_train,
+                          nb_epoch=parameters_dic['nb_epoch'],
+                          nb_batch=parameters_dic['nb_batch'],
+                          nb_hidden=parameters_dic['nb_hidden'])
 
-    gs = GridSearchCV(net, params, refit=False, scoring='r2', verbose=1, cv=2)
+    _ = regressor.fit(x_train, y_train)
+    lowest_error = regressor.score(x_test, y_test)
 
-    gs.fit(x, y)
+    parameters = {'nb_hidden': [3, 4, 5, 6],
+                  'nb_epoch': [50, 100, 500],
+                  'nb_batch': [128, 256, 512],
+                  }
 
-    #######################################################################
-    #                       ** START OF YOUR CODE **
-    #######################################################################
+    batchs = [[],[],[],[]]
+    epochs = [[],[],[],[]]
+    hiddens = [[],[],[],[]]
+    errors = [[],[],[],[]]
 
-    return  # Return the chosen hyper parameters
+    for batch in parameters['nb_batch']:
+        for epoch in parameters['nb_epoch']:
+            for idx, hidden in enumerate(parameters['nb_hidden']):
 
+                mean_error = cross_val(x_train, y_train, nb_epoch=epoch, nb_batch=batch, nb_hidden=hidden, cv=5)
+
+                batchs[idx].append(batch)
+                epochs[idx].append(epoch)
+                hiddens[idx].append(hidden)
+                errors[idx].append(mean_error)
+
+                if mean_error < lowest_error:
+                    lowest_error = mean_error
+                    parameters_dic["nb_hidden"] = hidden
+                    parameters_dic["nb_epoch"] = epoch
+                    parameters_dic["nb_batch"] = batch
+
+
+
+    # Creating figure
+    fig = plt.figure(figsize=(10, 7))
+    ax = plt.axes(projection="3d")
+    ax.set_xlabel('Batch size', fontweight ='bold')
+    ax.set_ylabel('Number of epochs', fontweight ='bold')
+    ax.set_zlabel('Error (RMSE)', fontweight ='bold')
+
+    # for hidden in hiddens:
+    ax.scatter3D(batchs[0], epochs[0], errors[0], marker='<')
+    ax.scatter3D(batchs[1], epochs[1], errors[1], marker='o')
+    ax.scatter3D(batchs[2], epochs[2], errors[2], marker='x')
+    ax.scatter3D(batchs[3], epochs[3], errors[3], marker='s')
+    ax.legend(['3','4','5','6'], title='Number of hidden layers', loc='best')
+
+    ax.grid(True)
+    plt.title("Regressor Hyperparameter Search between 36 models with Adam optimizer, \n learning rate = 1e-4 and 5 folds cross validation", fontweight ='bold')
+    # show plot
+    plt.show()
+
+    return parameters_dic, lowest_error
     #######################################################################
     #                       ** END OF YOUR CODE **
     #######################################################################
+
+
+def cross_val(x, y, nb_epoch, nb_batch, nb_hidden, cv=5):
+
+    list_of_errors = []
+    kf = KFold(n_splits=cv)
+    kf.get_n_splits(x)
+
+    for train_index, val_index in kf.split(x):
+
+        x_train, x_val = x.iloc[train_index], x.iloc[val_index]
+        y_train, y_val = y.iloc[train_index], y.iloc[val_index]
+
+        regressor = Regressor(x_train, nb_epoch=nb_epoch, nb_batch=nb_batch, nb_hidden=nb_hidden)
+        regressor.fit(x_train, y_train)
+        error = regressor.score(x_val, y_val)
+        list_of_errors.append(error)
+
+    avg = sum(list_of_errors) / len(list_of_errors)
+
+    return avg
+
+
+
 
 
 def example_main():
@@ -313,26 +417,34 @@ def example_main():
                                                      test_proportion=0.2,
                                                      random_generator=rg)
 
-
     # Training
     # This example trains on the whole available dataset.
     # You probably want to separate some held-out data
     # to make sure the model isn't overfitting
 
-    regressor = Regressor(x_train, nb_epoch=1000)
-    regressor.fit(x_train, y_train)
-    save_regressor(regressor)
+    #regressor =  Regressor(x_train, nb_epoch=10, nb_batch=128, nb_hidden=6)
+    #train_loss = regressor.fit(x_train, y_train)
+    #save_regressor(regressor)
 
-    for name, param in regressor.model.named_parameters():
-        if param.requires_grad:
-            print(name, param.data)
+    #plt.plot(train_loss)
+    #plt.show()
 
-    x,y = regressor._preprocessor(x,y,True)
-    RegressorHyperParameterSearch(x, y)
+    # for name, param in regressor.model.named_parameters():
+    #     if param.requires_grad:
+    #         print(name, param.data)
 
     # Error
-    error = regressor.score(x_test, y_test)
-    print("\nRegressor error: {}\n".format(error))
+    #error = regressor.score(x_test, y_test)
+    #print("\nRegressor error: {}\n".format(error))
+    #error = regressor.score(x_train, y_train)
+    #print("\nRegressor error: {}\n".format(error))
+
+    bestparams, besterror = RegressorHyperParameterSearch(x_train, x_test, y_train, y_test)
+    print("The lowest error is: ", besterror)
+    print("It is obtained with the following parameters:")
+    print("- The best number of hidden layers is: ", bestparams['nb_hidden'])
+    print("- The best number of epochs is: ", bestparams['nb_epoch'])
+    print("- The best batch size is: ", bestparams['nb_batch'])
 
 
 if __name__ == "__main__":
