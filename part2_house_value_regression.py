@@ -422,7 +422,7 @@ def example_main():
     # You probably want to separate some held-out data
     # to make sure the model isn't overfitting
 
-    #regressor =  Regressor(x_train, nb_epoch=10, nb_batch=128, nb_hidden=6)
+    #regressor =  Regressor(x_train, nb_epoch=50, nb_batch=128, nb_hidden=6)
     #train_loss = regressor.fit(x_train, y_train)
     #save_regressor(regressor)
 
@@ -432,19 +432,21 @@ def example_main():
     # for name, param in regressor.model.named_parameters():
     #     if param.requires_grad:
     #         print(name, param.data)
-
+    print("Before loading")
+    regressor_loaded = load_regressor()	
     # Error
-    #error = regressor.score(x_test, y_test)
-    #print("\nRegressor error: {}\n".format(error))
-    #error = regressor.score(x_train, y_train)
-    #print("\nRegressor error: {}\n".format(error))
+    #error_train = regressor.score(x_train, y_train)
+    #print("\nRegressor error (train): {}\n".format(error_train))
+    error = regressor_loaded.score(x_test, y_test)
+    print("\nRegressor error (test): {}\n".format(error))
+    
 
-    bestparams, besterror = RegressorHyperParameterSearch(x_train, x_test, y_train, y_test)
-    print("The lowest error is: ", besterror)
-    print("It is obtained with the following parameters:")
-    print("- The best number of hidden layers is: ", bestparams['nb_hidden'])
-    print("- The best number of epochs is: ", bestparams['nb_epoch'])
-    print("- The best batch size is: ", bestparams['nb_batch'])
+    #bestparams, besterror = RegressorHyperParameterSearch(x_train, x_test, y_train, y_test)
+    #print("The lowest error is: ", besterror)
+    #print("It is obtained with the following parameters:")
+    #print("- The best number of hidden layers is: ", bestparams['nb_hidden'])
+    #print("- The best number of epochs is: ", bestparams['nb_epoch'])
+    #print("- The best batch size is: ", bestparams['nb_batch'])
 
 
 if __name__ == "__main__":
