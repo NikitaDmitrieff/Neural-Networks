@@ -278,14 +278,14 @@ class Regressor():
 
         assert len(y) == len(y_predictions)
 
-        mse = mean_squared_error(y, y_predictions, squared=True)
-        SSres = np.sum((y.to_numpy()-y_predictions)**2)
-        SStot = ((y.to_numpy() - y.to_numpy().mean()) ** 2).sum()
-        determination_coef = 1 - SSres / SStot
+        #mse = mean_squared_error(y, y_predictions, squared=True)
+        #SSres = np.sum((y.to_numpy()-y_predictions)**2)
+        #SStot = ((y.to_numpy() - y.to_numpy().mean()) ** 2).sum()
+        #determination_coef = 1 - SSres / SStot
 
-        print('The R2 is: ', determination_coef)
+        #print('The R2 is: ', determination_coef)
         rmse = mean_squared_error(y, y_predictions, squared=False)
-        print('The RMSE is: ', rmse)
+        #print('The RMSE is: ', rmse)
 
         return rmse
 
