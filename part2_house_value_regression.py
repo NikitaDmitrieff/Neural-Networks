@@ -402,7 +402,6 @@ def RegressorHyperParameterSearch(x_train, x_test, y_train, y_test):
 
 
 def example_main():
-
     output_label = "median_house_value"
 
     # Use pandas to read CSV data as it contains various object types
@@ -422,37 +421,18 @@ def example_main():
                                                      random_generator=rg)
 
     # Training
-    # This example trains on the whole available dataset.
-    # You probably want to separate some held-out data
+    # This example trains on the whole available dataset. 
+    # You probably want to separate some held-out data 
     # to make sure the model isn't overfitting
 
-    regressor =  Regressor(x_train, nb_epoch=50)
+    regressor = Regressor(x_train, nb_epoch=50)
     regressor.fit(x_train, y_train)
     save_regressor(regressor)
 
-    #plt.plot(train_loss)
-    #plt.show()
-
-    # for name, param in regressor.model.named_parameters():
-    #     if param.requires_grad:
-    #         print(name, param.data)
-    
-    #print("Before loading")
-    #regressor_loaded = load_regressor()	
-    
     # Error
-    #error_train = regressor.score(x_train, y_train)
-    #print("\nRegressor error (train): {}\n".format(error_train))
     error = regressor.score(x_test, y_test)
-    #error = regressor_loaded.score(x_test, y_test)
-    print("\nRegressor error (test): {}\n".format(error))
-    
-    #bestparams, besterror = RegressorHyperParameterSearch(x_train, x_test, y_train, y_test)
-    #print("The lowest error is: ", besterror)
-    #print("It is obtained with the following parameters:")
-    #print("- The best number of hidden layers is: ", bestparams['nb_hidden'])
-    #print("- The best number of epochs is: ", bestparams['nb_epoch'])
-    #print("- The best batch size is: ", bestparams['nb_batch'])
+    print("\nRegressor error: {}\n".format(error))
+
 
 
 if __name__ == "__main__":
