@@ -162,7 +162,7 @@ class Regressor():
         Regressor training function
 
         Arguments:
-            - x {pd.DataFrame} -- Raw input array of shape
+            - x {pd.DataFrame} -- Raw input array of shape 
                 (batch_size, input_size).
             - y {pd.DataFrame} -- Raw output array of shape (batch_size, 1).
 
@@ -176,29 +176,25 @@ class Regressor():
         #######################################################################
 
         X, Y = self._preprocessor(x, y=y, training=True)  # Do not forget
-        losses = []
 
-
-        #for _ in tqdm.tqdm(range(self.nb_epoch)):
-        for _ in range(self.nb_epoch):
-            for batch in range(len(X) // self.nb_batch):
-                x_batch = X[batch * self.nb_batch:(batch + 1) * self.nb_batch]
-                y_batch = Y[batch * self.nb_batch:(batch + 1) * self.nb_batch]
-                # Reset the gradients
-                self.optimiser.zero_grad()
-                # forward pass
-                y_hat = self.model.forward(x_batch)
-                # compute loss
-                loss = self.criterion(y_hat, y_batch)
-                # Backward pass (compute the gradients)
-                loss.backward()
-                # update parameters
-                self.optimiser.step()
-            losses.append(np.sqrt(loss.item()))
+        for epoch in range(self.nb_epoch):
+            # Reset the gradients
+            self.optimiser.zero_grad()
+            # forward pass
+            y_hat = self.model(X)
+            # compute loss
+            loss = self.criterion(y_hat, Y)
+            # Backward pass (compute the gradients)
+            loss.backward()
+            # update parameters
+            self.optimiser.step()
 
             # print(f"Epoch: {epoch}\t w: {self.model.linear.weight.data[0]}\t b: {self.model.linear.bias.data[0]:.4f} \t L: {loss:.4f}")
 
         return self
+
+
+
 
         #######################################################################
         #                       ** END OF YOUR CODE **
