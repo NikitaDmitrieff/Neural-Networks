@@ -352,9 +352,9 @@ def RegressorHyperParameterSearch(x_train, x_test, y_train, y_test):
     # Creating figure
     fig = plt.figure(figsize=(10, 7))
     ax = plt.axes(projection="3d")
-    ax.set_xlabel('Batch size', fontweight ='bold')
-    ax.set_ylabel('Number of epochs', fontweight ='bold')
-    ax.set_zlabel('Error (RMSE)', fontweight ='bold')
+    ax.set_xlabel('Batch size')
+    ax.set_ylabel('Number of epochs')
+    ax.set_zlabel('Error (RMSE)')
 
     # for hidden in hiddens:
     ax.scatter3D(batchs[0], epochs[0], errors[0], marker='<')
@@ -364,7 +364,7 @@ def RegressorHyperParameterSearch(x_train, x_test, y_train, y_test):
     ax.legend(['3','4','5','6'], title='Number of hidden layers', loc='best')
 
     ax.grid(True)
-    plt.title("Regressor Hyperparameter Search between 36 models with Adam optimizer, \n learning rate = 1e-4 and 5 folds cross validation", fontweight ='bold')
+    plt.title("Regressor Hyperparameter Search between 36 models with Adam optimizer, \n learning rate = 1e-4 and 5 folds cross validation")
     # show plot
     plt.show()
 
