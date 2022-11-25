@@ -58,9 +58,9 @@ def cross_val(x, y, nb_epoch, nb_batch, nb_hidden, cv=5):
         error = regressor.score(x_val, y_val)
         list_of_errors.append(error)
 
-     avg = sum(list_of_errors) / len(list_of_errors)
+    avg = sum(list_of_errors) / len(list_of_errors)
      
-     return avg
+    return avg
 
 
 def split_dataset(x, y, test_proportion, random_generator=default_rng()):
